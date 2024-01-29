@@ -4,9 +4,11 @@ var historyarr = [];
 
 
 // variables for getting input of operants and operator
-var operator = 0; // it says that operator is at the end or not ( if at the end then don't take again )
-var fordot = 0; // it check for dot that is not come more than once
-var checkdot = 0; // help for do backspace operation 
+var operator = 1; // it says that operator is at the end or not ( if at the end then don't take again )
+var fordot = 0; // check for dot that is not come more than once for each number
+var checkdot = 0; // help for do backspace operation
+var leftparanthesis = 0;
+var rightparanthesis = 0;
 
 
 // add event listner on all the number and operator
@@ -15,16 +17,12 @@ for( let i = 0;i<calsulate;i++){
     document.querySelectorAll('.number')[i].addEventListener('click',function(event) {
 
         const letter = event.target.innerHTML;
+        console.log( "hello letter ", letter);
 
-        if( letter == '=' || letter == 'x^2' || letter == '1/x'){
+        if( letter == '=' || letter == 'x^2'){
             // calculate final
             console.log( "final string is " , numstring);
             expressionAnswer(numstring);
-        }
-        if( letter == '+/-' ){
-            console.log(letter);
-            numstring = '-' + numstring;
-            console.log(numstring);
         }
         if( letter == 'X'){
             console.log(letter);
@@ -39,10 +37,24 @@ for( let i = 0;i<calsulate;i++){
             console.log(numstring);
         }
         if( parseInt(letter) <=9 && parseInt(letter) >=0 ){
-            operator = 0;
-            console.log(letter);
+            let chara = numstring[numstring.length - 1];
+            if( chara != ')'){
+                operator = 0;
+                console.log(letter);
+                numstring = numstring + letter;
+                console.log(numstring);
+            }
+        }
+        if( letter == '(' && operator == 1){
+            console.log(letter)
             numstring = numstring + letter;
-            console.log(numstring);
+            console.log( numstring);
+        }
+        if( letter == ')' && operator == 0 ){
+            console.log(letter)
+            numstring = numstring + letter;
+            console.log( numstring);
+            fordot = 1;
         }
         if( letter == '.' && fordot == 0){
             fordot = 1;
@@ -71,8 +83,11 @@ function expressionAnswer(inputstring) {
     console.log(inputstring);
     let arr1 = convertInputtoArray(inputstring);
     console.log(arr1);
+    console.log( "we maked final array of nums and operator and now is postprifix");
     let arr2 = changeToPostfix(arr1);
+    console.log( "we maked new");
     console.log(arr2);
+    console.log( "we maked new 2" );
     let ans = finalAns(arr2);
     console.log(ans);
 }
@@ -80,30 +95,23 @@ function expressionAnswer(inputstring) {
 function convertInputtoArray(inputString){
     let currentNumber = '';
     let arr = [];
-    console.log( "we are in form of string start" , arr ," ",currentNumber);
 
     for (let i = 0; i < inputString.length; i++) {
         const currentChar = inputString[i];
         console.log(currentChar);
       
         if ( (parseInt(currentChar) <=9 && parseInt(currentChar) >=0) || currentChar == '.' ) {
-            console.log("here " ," ",currentNumber);
             currentNumber += currentChar;
-            console.log("here " ," ",currentNumber);
         }else {
-            console.log(" now ",arr ," ",currentNumber);
             arr.push(currentNumber);
             currentNumber = '';
-            console.log(" now ",arr ," ",currentNumber);
             arr.push(currentChar);
-            console.log(" now ",arr ," ",currentNumber);
         }
     }
     if (currentNumber != '') {
         arr.push(currentNumber);
     }
 
-    console.log( "we are in form of string " , arr);
     return arr;
 }
 
@@ -123,8 +131,17 @@ function changeToPostfix(infixExpression){
     for (let i = 0; i < infixExpression.length; i++) {
         const token = infixExpression[i];
     
-        if ( parseFloat(token) <=9 && parseFloat(token) >=0) {  // operand
+        if ( parseFloat(token) >=0) {  // operand
             newarr.push(token);
+        } else if (token == '(') {
+
+            stack.push(token);
+        } else if (token == ')') {
+
+            while (stack.length > 0 && stack[stack.length - 1] != '(') {
+              newarr += stack.pop();
+            }
+            stack.pop(); // Discard the '(' from the stack
         }else {  // operator
             while (
                 stack.length > 0 &&
@@ -138,19 +155,20 @@ function changeToPostfix(infixExpression){
     
     // Pop any remaining operators from the stack to the output
     while (stack.length > 0) {
-        newarr.push(stack.pop());
+        newarr += stack.pop();
     }
     
    return newarr;
+
 }
 
-function finalAns(){
+function finalAns(postfixExpression){
     const stack = [];
       
     for (let i = 0; i < postfixExpression.length; i++) {
         const token = postfixExpression[i];
       
-        if (parseFloat(token) <=9 && parseFloat(token) >=0) {
+        if (parseFloat(token) >=0) {
             // Operand
             stack.push(parseFloat(token));
         } else {
@@ -175,7 +193,7 @@ function finalAns(){
                     stack.push((operand1 % operand2));
                     break;
                 default:
-                    throw new Error('Invalid operator: ' + token);
+                    console.log('Invalid operator: ' + token);
             }
         }
     }
@@ -185,61 +203,6 @@ function finalAns(){
     }
       
     return stack.pop();
-      
+
 }
-
-
-
-
-// function infixToPostfix(infixExpression) {
-//     const precedence = {
-//       '+': 1,
-//       '-': 1,
-//       '*': 2,
-//       '/': 2,
-//       '^': 3
-//     };
-  
-//     let output = '';
-//     const stack = [];
-  
-//     for (let i = 0; i < infixExpression.length; i++) {
-//       const token = infixExpression[i];
-  
-//       if (/[a-zA-Z0-9]/.test(token)) {
-//         // Operand
-//         output += token;
-//       } else if (token === '(') {
-//         // Left parenthesis
-//         stack.push(token);
-//       } else if (token === ')') {
-//         // Right parenthesis
-//         while (stack.length > 0 && stack[stack.length - 1] !== '(') {
-//           output += stack.pop();
-//         }
-//         stack.pop(); // Discard the '(' from the stack
-//       } else {
-//         // Operator
-//         while (
-//           stack.length > 0 &&
-//           precedence[token] <= precedence[stack[stack.length - 1]]
-//         ) {
-//           output += stack.pop();
-//         }
-//         stack.push(token);
-//       }
-//     }
-  
-//     // Pop any remaining operators from the stack to the output
-//     while (stack.length > 0) {
-//       output += stack.pop();
-//     }
-  
-//     return output;
-//   }
-  
-//   // Example usage:
-//   const infixExpression = "a + b * (c - d) / e";
-//   const postfixExpression = infixToPostfix(infixExpression);
-//   console.log(postfixExpression);  // Output: "a b c d - * e / +"
   
