@@ -1,14 +1,9 @@
 var numstring = "";
-// var arr = [];
 var historyarr = [];
 
-
 // variables for getting input of operants and operator
-var operator = 1; // it says that operator is at the end or not ( if at the end then don't take again )
 var fordot = 0; // check for dot that is not come more than once for each number
-var checkdot = 0; // help for do backspace operation
-var leftparanthesis = 0;
-var rightparanthesis = 0;
+var paranthesis = 0;
 
 
 // add event listner on all the number and operator
@@ -26,54 +21,65 @@ for( let i = 0;i<calsulate;i++){
         }
         if( letter == 'X'){
             console.log(letter);
+            console.log("now delete");
             let chara = numstring[numstring.length - 1];
-            numstring.slice(0,-1);
-            if( chara == '.' ){
-                fordot == 0
+            console.log("now deleting char " ,chara);
+            numstring = numstring.slice(0,-1);
+            console.log("now after delete " ,numstring);
+            fordot=0;
+            if( chara == ')' ){
+                paranthesis++;
             }
-            if( chara == '+' || chara == '-' || chara == '*' ||chara == '/' || chara == '%' ){
-                operator = 0;
+            if( chara == '(' ){
+                paranthesis--;
+            }
+            for( let as = numstring.length-1;as>=0;as--){
+                if( numstring[as] == ')' && as == numstring.length-1){
+                    fordot = 1;
+                    break;
+                }
+                if( numstring[as] == '.'){
+                    fordot = 1;
+                    break;
+                }
+                if( numstring[as] == '+' || numstring[as] == '-' || numstring[as] == '*' ||numstring[as] == '/' || numstring[as] == '%' || numstring[as] == ')' ){
+                    break;
+                }
             }
             console.log(numstring);
         }
         if( parseInt(letter) <=9 && parseInt(letter) >=0 ){
             let chara = numstring[numstring.length - 1];
             if( chara != ')'){
-                operator = 0;
-                console.log(letter);
                 numstring = numstring + letter;
-                console.log(numstring);
             }
         }
-        if( letter == '(' && operator == 1){
-            console.log(letter)
-            numstring = numstring + letter;
-            console.log( numstring);
+        if( letter == '(' ){
+            let chara = numstring[numstring.length - 1];
+            if( chara == '+' || chara == '-' || chara == '*' || chara == '/' || chara == '%' || chara == '('){
+                numstring = numstring + letter;
+                paranthesis++;
+            }
         }
-        if( letter == ')' && operator == 0 ){
-            console.log(letter)
-            numstring = numstring + letter;
-            console.log( numstring);
-            fordot = 1;
+        if( letter == ')' && paranthesis > 0){
+            let chara = numstring[numstring.length - 1];
+            if( chara == '+' || chara == '-' || chara == '*' || chara == '/' || chara == '%' ){
+            }else{
+                numstring = numstring + letter;
+                paranthesis--;
+                fordot = 1;
+            }
         }
         if( letter == '.' && fordot == 0){
             fordot = 1;
-            console.log(letter);
             numstring = numstring + letter;
-            console.log(numstring);
         }
-        if( (letter == '+' || letter == '-' || letter == '*' || letter == '/' || letter == '%') && operator == 0 ){
-            operator = 1;
-            fordot = 0;
-            console.log(letter);
+        if( letter == '+' || letter == '-' || letter == '*' || letter == '/' || letter == '%'){
             let chara = numstring[numstring.length - 1];
-            if( chara == '.' ){
-                fordot == 0
-                numstring[numstring.length - 1] = letter;
-                console.log(numstring);
+            if( chara == '.' || chara == '+' || chara == '-' || chara == '*' || chara == '/' || chara == '%' || chara == '(' || numstring.length == 0){
             }else{
                 numstring = numstring + letter;
-                console.log(numstring);
+                fordot = 0;
             }
         }
     })
@@ -103,8 +109,10 @@ function convertInputtoArray(inputString){
         if ( (parseInt(currentChar) <=9 && parseInt(currentChar) >=0) || currentChar == '.' ) {
             currentNumber += currentChar;
         }else {
-            arr.push(currentNumber);
-            currentNumber = '';
+            if (currentNumber != '') {
+                arr.push(currentNumber);
+                currentNumber = '';
+            }
             arr.push(currentChar);
         }
     }
@@ -126,7 +134,7 @@ function changeToPostfix(infixExpression){
     };
     
     let newarr = [];
-    const stack = [];
+    let stack = [];
     
     for (let i = 0; i < infixExpression.length; i++) {
         const token = infixExpression[i];
@@ -139,7 +147,7 @@ function changeToPostfix(infixExpression){
         } else if (token == ')') {
 
             while (stack.length > 0 && stack[stack.length - 1] != '(') {
-              newarr += stack.pop();
+                newarr.push(stack.pop());
             }
             stack.pop(); // Discard the '(' from the stack
         }else {  // operator
@@ -155,11 +163,10 @@ function changeToPostfix(infixExpression){
     
     // Pop any remaining operators from the stack to the output
     while (stack.length > 0) {
-        newarr += stack.pop();
+        newarr.push(stack.pop());
     }
     
    return newarr;
-
 }
 
 function finalAns(postfixExpression){
@@ -190,7 +197,7 @@ function finalAns(postfixExpression){
                     stack.push(operand1 / operand2);
                     break;
                 case '%':
-                    stack.push((operand1 % operand2));
+                    stack.push((operand1 ^ operand2));
                     break;
                 default:
                     console.log('Invalid operator: ' + token);
@@ -203,6 +210,5 @@ function finalAns(postfixExpression){
     }
       
     return stack.pop();
-
 }
   
