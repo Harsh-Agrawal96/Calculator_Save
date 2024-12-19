@@ -4,6 +4,13 @@ This is a simple, user-friendly calculator web frontend application that perform
 
 ---
 
+## Hosted Link 
+
+   Explore the fully functional calculator with history feature here:  
+   👉 [Calculator Application](https://harsh-agrawal96.github.io/Calculator_Save/)
+
+---
+
 ## **Features**
 
 - Performs arithmetic operations: **Addition (+)**, **Subtraction (-)**, **Multiplication (×)**, **Division (÷)**, **Subtraction (%)**, **Multiplication (×^2)**.
