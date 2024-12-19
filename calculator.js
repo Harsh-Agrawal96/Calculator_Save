@@ -24,6 +24,10 @@ function deleteLast() {
 function squareExpression() {
 
   const display = document.getElementById("display");
+  if( display.innerText === "Error" || display.innerText === "Infinity" ){
+    display.innerText = "Error";
+    return;
+  }
   try {
     const value = eval(display.innerText);
     const result = value ** 2;
@@ -39,6 +43,10 @@ function squareExpression() {
 function calculate() {
 
   const display = document.getElementById("display");
+  if( display.innerText === "Error" || display.innerText === "Infinity" ){
+    display.innerText = "Error";
+    return;
+  }
   try {
     const result = eval(display.innerText);
     const expression = `${display.innerText} = ${result}`;
